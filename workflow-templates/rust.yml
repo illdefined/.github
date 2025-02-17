@@ -1,0 +1,55 @@
+name: Rust build
+
+on:
+  - push
+  - pull_request
+  - workflow_dispatch
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_TERM_VERBOSE: 1
+  RUST_BACKTRACE: 1
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup default nightly
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy
+  
+  build-native:
+    strategy:
+      matrix:
+        system:
+          - ubuntu-latest
+          - ubuntu-24.04-arm
+          - macos-latest
+          - windows-latest
+
+    runs-on: ${{ matrix.system }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup default nightly
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --all-features
+      - run: cargo build --release
+
+  build-cross:
+    strategy:
+      matrix:
+        target:
+          - qemu: riscv64
+          - rust: riscv64gc-unknown-linux-gnu
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup target add ${{ target.rust }}
+      - run: rustup default nightly
+      - uses: Swatinem/rust-cache@v2
+      - uses: docker/setup-qemu-action@v3
+        platforms: ${{ target.qemu }}
+      - run: cargo --target ${{ target.rust }} test --all-features
+      - run: cargo build --release
