@@ -1,0 +1,6 @@
+{
+  "name": "Rust audit",
+  "description": "Rust audit workflow template.",
+  "categories": [ "Rust" ],
+  "filePatterns": [ "^Cargo.toml$" ]
+}

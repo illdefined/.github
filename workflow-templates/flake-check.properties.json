@@ -1,0 +1,6 @@
+{
+  "name": "Nix flake check",
+  "description": "Nix flake check workflow template.",
+  "categories": [ "Nix" ],
+  "filePatterns": [ "^flake.nix$" ]
+}
